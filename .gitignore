@@ -1,0 +1,19 @@
+# Virtual environment — rebuilt from uv.lock, never committed
+.venv/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Office lock files (created while an .xlsx is open)
+~$*
+
+# Windows / editor cruft
+Thumbs.db
+desktop.ini
+
+.venv/
+__pycache__/
+.ruff_cache/

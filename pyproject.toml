@@ -1,0 +1,26 @@
+[project]
+name = "batch-calculations"
+version = "0.1.0"
+description = "Stoichiometry and batch-weight calculations for ceramic sample preparation."
+requires-python = ">=3.13"
+
+# Packages the calculation script itself needs to run.
+dependencies = [
+    "openpyxl",     # reads and writes .xlsx files
+    "pandas",       # tabular handling of the results CSV
+]
+
+# Tools you use while working, but that the script does not need to run.
+# Installed by default; skip them with:  uv sync --no-dev
+[dependency-groups]
+dev = [
+    "ipykernel",    # required for the "# %%" interactive cell workflow in VS Code
+    "ruff!=0.16.1", # formatter and linter (0.16.1 shipped no Windows wheel)
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# E/F = pycodestyle + pyflakes errors, I = import sorting, UP = modern syntax.
+select = ["E", "F", "I", "UP"]

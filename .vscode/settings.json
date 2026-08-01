@@ -1,0 +1,25 @@
+{
+  // Point VS Code at this project's own environment, so every terminal,
+  // "Run Cell", and debug session uses it automatically.
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+  "python.terminal.activateEnvInCurrentTerminal": true,
+
+  // Pylance: catch obvious type mistakes without being noisy.
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+
+  // Format and tidy imports on every save.
+  "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+  // Keep the file tree readable.
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.ruff_cache": true
+  }
+}
