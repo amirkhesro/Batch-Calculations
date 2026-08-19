@@ -163,6 +163,9 @@ equivalent of `--use`. The defaults are defined in `batch_calculations/data.py`.
     uv run pytest
     uv run ruff check .
 
+Or, without uv, `pip install -e .` installs the package in editable form and
+`pytest` and `ruff check .` then run directly.
+
 The test suite includes batches verified against independent hand
 calculations.
 
