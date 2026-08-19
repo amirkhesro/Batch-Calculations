@@ -1,19 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "batch-calculations"
-version = "0.1.0"
-description = "Stoichiometry and batch-weight calculations for ceramic sample preparation."
-requires-python = ">=3.13"
-
-# Packages the calculation script itself needs to run.
-dependencies = [
-    "openpyxl",     # reads and writes .xlsx files
-    "pandas",       # tabular handling of the results CSV
+version = "0.2.0"
+description = "Stoichiometry and batch-weight calculations for solid-state ceramic synthesis."
+readme = "README.md"
+authors = [{ name = "Amir Khesro" }]
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["stoichiometry", "ceramics", "solid-state synthesis", "batch calculation"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Programming Language :: Python :: 3",
 ]
 
-# Tools you use while working, but that the script does not need to run.
-# Installed by default; skip them with:  uv sync --no-dev
+dependencies = [
+    "openpyxl",     # reads and writes the .xlsx log workbook
+]
+
+[project.scripts]
+batchcalc = "batch_calculations.cli:main"
+
+[project.urls]
+Repository = "https://github.com/amirkhesro/batch-calculations"
+
+# Tools used while developing, not needed to run the package.
+# Installed by default with uv; skip them with:  uv sync --no-dev
 [dependency-groups]
 dev = [
+    "pytest",
     "ipykernel",    # required for the "# %%" interactive cell workflow in VS Code
     "ruff!=0.16.1", # formatter and linter (0.16.1 shipped no Windows wheel)
 ]
@@ -24,3 +42,6 @@ line-length = 100
 [tool.ruff.lint]
 # E/F = pycodestyle + pyflakes errors, I = import sorting, UP = modern syntax.
 select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
