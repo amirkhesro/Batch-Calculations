@@ -1,40 +1,142 @@
 # batch-calculations
 
-Stoichiometry and batch-weight calculations for solid-state ceramic synthesis.
+A batch-weight calculator for solid-state ceramic synthesis. Give it a target
+composition and a batch mass, and it tells you how many grams of each raw
+material to weigh out. Every run is appended to an Excel log workbook, so
+nothing already recorded is ever overwritten.
 
-Give it a target composition and a batch mass, and it works out how many grams
-of each raw material to weigh out. Every run is appended to an Excel log
-workbook, so nothing already recorded is ever overwritten.
+Written and maintained by Amir Khesro, University of Sheffield.
 
-## Install
+## What you need before starting
 
-Directly from GitHub:
+A computer with Python 3.11 or newer. To check, open a terminal (see step 1
+below) and run:
 
-    pip install git+https://github.com/amirkhesro/batch-calculations.git
+    python --version
 
-For a private repository, authenticate first (for example with the GitHub CLI,
-`gh auth login`) or use an SSH remote:
+If Python is missing or too old, install it from https://www.python.org/downloads/
+and tick the box that says "Add Python to PATH" during installation.
 
-    pip install git+ssh://git@github.com/amirkhesro/batch-calculations.git
+## Step 1: Open a terminal
 
-Or, working on the code itself, clone the repository and run `uv sync` (or
-`pip install -e .`).
+On Windows, press the Start key, type "PowerShell" and press Enter.
+On macOS, open the Terminal app. On Linux, open your usual terminal.
 
-## Command line use
+Do not run PowerShell as administrator. It is not needed and it starts you in
+a protected system folder where the log file cannot be written.
 
-    batchcalc "Sr0.38La0.12Ba0.5Ti0.12Nb1.88O6" 30
-    batchcalc "Ba0.5Sr0.5TiO3" 25 --use Ti=TiO2 --purity Nb2O5=0.998
+## Step 2: Install the package (once per computer)
+
+Copy this line into the terminal and press Enter:
+
+    pip install git+https://github.com/amirkhesro/Batch-Calculations.git
+
+## Step 3: Check it works
+
+    batchcalc --version
+
+You should see a version number, for example `batchcalc 0.2.0`. If PowerShell
+says the command is not recognised, close the terminal, open a new one and try
+again. If it still fails, run it as `python -m batch_calculations.cli --version`
+and use that form throughout.
+
+## Step 4: Move to a folder where you keep lab records
+
+The Excel log is written to whatever folder the terminal is currently in, so
+go somewhere sensible first:
+
+    cd $HOME\Documents
+
+## Step 5: Run your first calculation
+
+The pattern is: composition in quotes, then batch mass in grams.
+
+    batchcalc "Ba0.85Ca0.15Zr0.1Ti0.9O3" 30
+
+You get the formula weight, the moles of product, and a weighing table listing
+grams of each raw material, the total mass to weigh, and the mass that will be
+lost on firing as CO2. The run is also appended to `stoichiometry_log.xlsx`
+in the current folder.
+
+## Step 6: Enter the purity of your reagents
+
+Read the assay from each bottle and pass it as a fraction, one flag per
+reagent:
+
+    batchcalc "Ba0.85Ca0.15Zr0.1Ti0.9O3" 30 --purity BaCO3=0.995 --purity TiO2=0.999
+
+The calculator weighs those reagents proportionally heavier so that the moles
+of cation delivered are exactly right. Enter purities for any batch that will
+be measured, compared or published. It is the differences in purity between
+reagents that shift your cation ratios, not the absolute values, so a purity
+common to every bottle changes nothing while a mismatch between two bottles
+shifts stoichiometry by roughly the size of the mismatch.
+
+## Step 7: Other options you will use
+
+Choose a different raw material for an element (defaults are carbonates for
+alkalis and alkaline earths, oxides for most other cations):
+
+    batchcalc "BaTiO3" 10 --use Ba=BaO
+
+Store processing notes with the batch record:
+
     batchcalc "BaTiO3" 10 --note "calcine 1200 C, 4 h"
+
+Quick check without saving anything:
+
     batchcalc "BaTiO3" 10 --no-log
 
-Options:
+Send the log to a specific file:
 
-    --use EL=FORMULA          raw material for an element, e.g. --use Ti=TiO2
-    --purity FORMULA=FRACTION purity of a raw material, e.g. --purity BaCO3=0.995
-    --default-purity FRACTION purity assumed when not given (default 1.0)
-    --note TEXT               free text stored with the batch
-    --log FILE                log workbook (default stoichiometry_log.xlsx)
-    --no-log                  print only, do not save
+    batchcalc "BaTiO3" 10 --log C:\Users\you\Documents\my_log.xlsx
+
+Assume a single purity for every reagent you have not named individually
+(the default is 1.0, meaning everything is treated as 100 per cent pure):
+
+    batchcalc "BaTiO3" 10 --default-purity 0.99
+
+## Writing formulas
+
+Decimal subscripts, brackets and hydrate notation are all accepted:
+`Ba0.5Sr0.5TiO3`, `La(OH)3`, `CuSO4*5H2O`. Spaces are ignored. Write hydrates
+with `*` or a middot, not a bare dot. Be careful to type the letter O for
+oxygen, not the digit zero.
+
+## Assumptions
+
+All precursors are treated as dry, with no water of crystallisation.
+Impurities are assumed inert: the purity correction fixes the moles of cation
+delivered, and the impurity mass simply ends up in the batch. Oxygen, carbon,
+hydrogen and nitrogen are supplied by the precursors or the furnace atmosphere
+and never need a raw material of their own. Reagents are taken as 100 per cent
+pure unless stated, so batches stay comparable run to run. The calculator
+cross-checks what the chosen reagents deliver against what the formula wants
+and prints a warning for anything missing, over-supplied or under-supplied.
+
+## The log workbook
+
+Each run appends one row to a "Batches" sheet and one row per raw material to
+a "Raw Materials" sheet, with a shared batch ID, a timestamp, and the purities
+used. If the workbook is open in Excel and locked, the run is saved to a
+timestamped fallback file instead and the message tells you where.
+
+## Troubleshooting
+
+"Permission denied" when saving the log: your terminal is in a protected
+folder, usually C:\WINDOWS\system32. Run `cd $HOME\Documents` and try again.
+
+"batchcalc is not recognised": open a fresh terminal, or use
+`python -m batch_calculations.cli` instead.
+
+"No default raw material for X": the element has no default precursor in the
+built-in table. Tell the calculator what to use, for example `--use X=XO2`.
+
+## Updating
+
+When the code improves, update with:
+
+    pip install --upgrade --force-reinstall git+https://github.com/amirkhesro/Batch-Calculations.git
 
 ## Use from Python
 
@@ -52,37 +154,18 @@ Options:
 formula weight, moles of product, and one `Reagent` per raw material with its
 molar mass, purity and mass to weigh.
 
-## Assumptions and conventions
-
-All precursors are treated as dry: no water of crystallisation is considered
-anywhere. Purity scales the weighed mass, so a reagent recorded at 0.995 purity
-is weighed proportionally heavier to deliver the same moles of cation; any
-impurity is assumed inert and simply ends up in the batch. Reagents are taken
-as 100 per cent pure unless a purity is given, so batches stay comparable run
-to run. Oxygen, carbon, hydrogen and nitrogen are supplied by the precursors
-or the furnace atmosphere and never need a raw material of their own.
-
-Formulas accept decimal subscripts, nested brackets and hydrate notation:
-`Ba0.5Sr0.5TiO3`, `La(OH)3`, `CuSO4*5H2O`. Write hydrates with `*` or the
-middot, not a bare dot, so the coefficient is unambiguous.
-
-Default raw materials (carbonates for the alkalis and alkaline earths, oxides
-for most other cations) are defined in `batch_calculations/data.py` and can be
-overridden per run with `--use` or the `precursor_choices` argument.
-
-The calculation cross checks what the chosen reagents actually deliver against
-what the target formula wants, and prints a warning for anything missing,
-over supplied or under supplied.
-
-## Log workbook
-
-Each run appends one row to a `Batches` sheet and one row per raw material to
-a `Raw Materials` sheet, with a shared batch ID and timestamp. If the workbook
-is open in Excel and locked, the run is saved to a timestamped fallback file
-instead and the error message tells you where.
+Pass `precursor_choices` to pick the raw material for an element, the Python
+equivalent of `--use`. The defaults are defined in `batch_calculations/data.py`.
 
 ## Development
 
     uv sync
     uv run pytest
     uv run ruff check .
+
+The test suite includes batches verified against independent hand
+calculations.
+
+## Licence
+
+MIT. See the LICENSE file.
